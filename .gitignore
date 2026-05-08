@@ -1,0 +1,18 @@
+# Editor
+.vscode/
+.idea/
+.DS_Store
+
+# Local settings
+.env
+.env.local
+
+# Sub-projects
+cvinsight_api/.venv/
+cvinsight_api/__pycache__/
+cvinsight_api/cvinsight.db
+cvinsight_api/uploads/*
+!cvinsight_api/uploads/.gitkeep
+
+cvinsight_web/node_modules/
+cvinsight_web/dist/
