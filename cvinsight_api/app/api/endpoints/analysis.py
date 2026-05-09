@@ -16,13 +16,41 @@ from sqlalchemy import select, desc
 from app.db.database import get_db
 from app.models.analysis import Analysis
 from app.schemas.analysis import (
-    AnalysisRequest, JobMatchRequest,
+    AnalysisRequest, JobMatchRequest, CoverLetterRequest,
     AnalysisResult, UploadResponse, HistoryItem
 )
 from app.services import cv_parser, ai_analyzer
 from app.config import settings
 
 router = APIRouter(prefix="/api", tags=["analysis"])
+
+
+@router.post("/generate-cover-letter", response_model=AnalysisResult)
+async def generate_cover_letter(
+    request: CoverLetterRequest,
+    db: AsyncSession = Depends(get_db),
+):
+    """Generate a cover letter for a CV and job description."""
+    analysis = await _get_analysis_or_404(db, request.analysis_id)
+
+    if not analysis.raw_text:
+        raise HTTPException(status_code=422, detail="No text found in uploaded CV.")
+
+    try:
+        content = await ai_analyzer.generate_cover_letter(
+            analysis.raw_text, 
+            request.job_description,
+            tone=request.tone
+        )
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"Cover letter generation failed: {e}")
+
+    analysis.cover_letter = content
+    analysis.cover_letter_jd = request.job_description
+
+    await db.commit()
+    await db.refresh(analysis)
+    return analysis
 
 ALLOWED_EXTENSIONS = {".pdf", ".docx", ".doc"}
 
@@ -135,6 +163,7 @@ async def job_match(
     analysis.job_match_score = result.get("match_score")
     analysis.job_matched_skills = result.get("matched_skills", [])
     analysis.job_missing_skills = result.get("missing_skills", [])
+    analysis.job_recommendation = result.get("recommendation")
 
     await db.commit()
     await db.refresh(analysis)

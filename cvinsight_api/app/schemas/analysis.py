@@ -12,6 +12,12 @@ class JobMatchRequest(BaseModel):
     job_description: str
 
 
+class CoverLetterRequest(BaseModel):
+    analysis_id: int
+    job_description: str
+    tone: str = "professional"  # professional, creative, concise
+
+
 class AnalysisResult(BaseModel):
     id: int
     filename: str
@@ -27,7 +33,10 @@ class AnalysisResult(BaseModel):
     job_match_score: Optional[float] = None
     job_missing_skills: List[str] = Field(default_factory=list)
     job_matched_skills: List[str] = Field(default_factory=list)
+    job_recommendation: Optional[str] = None
     job_description: Optional[str] = None
+    cover_letter: Optional[str] = None
+    cover_letter_jd: Optional[str] = None
     created_at: Optional[datetime] = None
 
     class Config:

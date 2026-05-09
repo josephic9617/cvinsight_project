@@ -135,7 +135,8 @@ const runJobMatch = async () => {
               <CheckCircle2 class="w-4 h-4" /> Matched Skills
             </h4>
             <div class="flex flex-wrap gap-2">
-              <span v-for="skill in matchResult.job_matched_skills" :key="skill" class="px-3 py-1 bg-accent-success/10 text-accent-success text-xs font-bold rounded-lg border border-accent-success/20">
+              <span v-for="skill in matchResult.job_matched_skills" :key="skill" class="px-3 py-1.5 bg-accent-success/10 text-accent-success text-xs font-bold rounded-xl border border-accent-success/20 flex items-center gap-2 group hover:bg-accent-success/20 transition-all">
+                <span class="w-1 h-1 rounded-full bg-accent-success group-hover:scale-150 transition-transform"></span>
                 {{ skill }}
               </span>
               <p v-if="!matchResult.job_matched_skills.length" class="text-xs text-gray-500 italic">No significant matches found.</p>
@@ -147,10 +148,37 @@ const runJobMatch = async () => {
               <XCircle class="w-4 h-4" /> Missing Skills
             </h4>
             <div class="flex flex-wrap gap-2">
-              <span v-for="skill in matchResult.job_missing_skills" :key="skill" class="px-3 py-1 bg-accent-danger/10 text-accent-danger text-xs font-bold rounded-lg border border-accent-danger/20">
+              <span v-for="skill in matchResult.job_missing_skills" :key="skill" class="px-3 py-1.5 bg-accent-danger/10 text-accent-danger text-xs font-bold rounded-xl border border-accent-danger/20 flex items-center gap-2 group hover:bg-accent-danger/20 transition-all">
+                <span class="w-1 h-1 rounded-full bg-accent-danger group-hover:scale-150 transition-transform"></span>
                 {{ skill }}
               </span>
               <p v-if="!matchResult.job_missing_skills.length" class="text-xs text-gray-500 italic">No major missing skills detected.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Skill Gap Analysis -->
+        <div class="mt-12 pt-8 border-t border-dark-700">
+          <h4 class="text-xs font-bold text-gray-500 uppercase tracking-widest mb-6">Skill Alignment Visualization</h4>
+          <div class="space-y-4">
+            <div class="flex items-center gap-4">
+              <div class="flex-1 bg-dark-700 h-3 rounded-full overflow-hidden flex">
+                <div 
+                  class="h-full bg-accent-success transition-all duration-1000 delay-300"
+                  :style="{ width: `${(matchResult.job_matched_skills.length / (matchResult.job_matched_skills.length + matchResult.job_missing_skills.length || 1)) * 100}%` }"
+                ></div>
+                <div 
+                  class="h-full bg-accent-danger/30 transition-all duration-1000 delay-500"
+                  :style="{ width: `${(matchResult.job_missing_skills.length / (matchResult.job_matched_skills.length + matchResult.job_missing_skills.length || 1)) * 100}%` }"
+                ></div>
+              </div>
+              <span class="text-xs font-bold text-white whitespace-nowrap">
+                {{ matchResult.job_matched_skills.length }} / {{ matchResult.job_matched_skills.length + matchResult.job_missing_skills.length }} Skills
+              </span>
+            </div>
+            <div class="flex justify-between text-[10px] font-bold text-gray-500 uppercase">
+              <span class="text-accent-success">Matched</span>
+              <span class="text-accent-danger">Missing</span>
             </div>
           </div>
         </div>
@@ -164,9 +192,9 @@ const runJobMatch = async () => {
         <div>
           <h4 class="text-lg font-bold text-white font-outfit mb-2">Tailoring Advice</h4>
           <p class="text-gray-300 leading-relaxed italic text-sm">
-            {{ matchResult.job_missing_skills.length
-              ? 'Use the missing skills as a checklist. Add them only where they are genuinely reflected in your work, and connect each one to a measurable result or project outcome.'
-              : 'Your resume already aligns well with this role. Focus on sharpening impact statements and keeping the strongest matching skills near the top of the document.' }}
+            {{ matchResult.job_recommendation || (matchResult.job_missing_skills.length
+              ? 'Use the missing skills as a checklist. Add them only where they are genuinely reflected in your work.'
+              : 'Your resume already aligns well with this role.') }}
           </p>
         </div>
       </div>

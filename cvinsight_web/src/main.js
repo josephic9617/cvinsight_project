@@ -9,6 +9,7 @@ import HomeView from './views/HomeView.vue'
 import UploadView from './views/UploadView.vue'
 import DashboardView from './views/DashboardView.vue'
 import JobMatchView from './views/JobMatchView.vue'
+import CoverLetterView from './views/CoverLetterView.vue'
 import HistoryView from './views/HistoryView.vue'
 
 const router = createRouter({
@@ -18,6 +19,7 @@ const router = createRouter({
     { path: '/upload', name: 'upload', component: UploadView, meta: { title: 'Upload Resume' } },
     { path: '/analysis/:id', name: 'analysis', component: DashboardView, props: true, meta: { title: 'Analysis' } },
     { path: '/job-match/:id', name: 'job-match', component: JobMatchView, props: true, meta: { title: 'Job Match' } },
+    { path: '/cover-letter/:id', name: 'cover-letter', component: CoverLetterView, props: true, meta: { title: 'Cover Letter' } },
     { path: '/history', name: 'history', component: HistoryView, meta: { title: 'History' } },
   ]
 })

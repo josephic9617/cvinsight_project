@@ -2,7 +2,8 @@
 import { ref, onMounted } from 'vue'
 import { 
   TrendingUp, AlertTriangle, Lightbulb, Search, 
-  ArrowLeft, Target, Sparkles, MessageSquare, CheckCircle2
+  ArrowLeft, Target, Sparkles, MessageSquare, CheckCircle2,
+  FileText
 } from 'lucide-vue-next'
 import api, { getErrorMessage } from '../lib/api'
 
@@ -78,6 +79,12 @@ const copySummary = async () => {
         <p class="text-gray-400 text-sm mt-1">Analyzed on {{ new Date(analysis.created_at).toLocaleDateString() }}</p>
       </div>
       <div class="flex items-center gap-3">
+        <RouterLink 
+          :to="`/cover-letter/${analysis.id}`"
+          class="px-5 py-2.5 bg-dark-700 text-white font-bold rounded-xl hover:bg-dark-600 transition-all flex items-center gap-2 border border-dark-600"
+        >
+          <FileText class="w-4 h-4" /> Cover Letter AI
+        </RouterLink>
         <RouterLink 
           :to="`/job-match/${analysis.id}`"
           class="px-5 py-2.5 bg-accent-primary text-white font-bold rounded-xl hover:bg-indigo-500 transition-all flex items-center gap-2 shadow-lg shadow-accent-primary/20"

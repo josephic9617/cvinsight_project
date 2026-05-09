@@ -29,6 +29,11 @@ class Analysis(Base):
     job_match_score = Column(Float, nullable=True)
     job_missing_skills = Column(JSON, default=list)
     job_matched_skills = Column(JSON, default=list)
+    job_recommendation = Column(Text, nullable=True)
+
+    # Cover Letter
+    cover_letter = Column(Text, nullable=True)
+    cover_letter_jd = Column(Text, nullable=True)
 
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
