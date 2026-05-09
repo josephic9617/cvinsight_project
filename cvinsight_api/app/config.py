@@ -12,7 +12,7 @@ class Settings(BaseSettings):
 
     AI_PROVIDER: str = "ollama"  # "ollama" or "openai"
 
-    OLLAMA_BASE_URL: str = "http://172.16.6.80:8084"
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
     OLLAMA_MODEL: str = "gemma4:26b"
 
     OPENAI_API_KEY: str = ""

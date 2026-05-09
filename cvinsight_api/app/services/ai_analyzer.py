@@ -42,7 +42,7 @@ JD: {job_description}
 """
 
 COVER_LETTER_PROMPT = """Generate a {tone} cover letter.
-Return ONLY JSON: cover_letter (string).
+Return ONLY the raw cover letter text. Do NOT use JSON formatting, do NOT wrap in markdown code blocks. Start the cover letter directly.
 
 Resume: {cv_text}
 JD: {job_description}
@@ -89,11 +89,11 @@ async def generate_cover_letter(cv_text: str, job_description: str, tone: str = 
     )
 
     if settings.AI_PROVIDER == "openai":
-        result = await _call_openai(prompt)
+        result = await _call_openai(prompt, is_json=False)
     else:
-        result = await _call_ollama(prompt, max_tokens=2048)
+        result = await _call_ollama(prompt, max_tokens=2048, is_json=False)
 
-    letter = result.get("cover_letter", "")
+    letter = result.get("text", "")
     if not letter:
         logger.warning("generate_cover_letter: AI returned empty cover_letter. Raw result: %s", result)
     return letter
@@ -103,22 +103,27 @@ async def generate_cover_letter(cv_text: str, job_description: str, tone: str = 
 # Internal API callers
 # ---------------------------------------------------------------------------
 
-async def _call_ollama(prompt: str, max_tokens: int = 2048) -> Dict[str, Any]:
+async def _call_ollama(prompt: str, max_tokens: int = 2048, is_json: bool = True) -> Dict[str, Any]:
     """Call Ollama Chat API using persistent client."""
     client = _get_client()
+    
+    system_prompt = "You are an ATS resume analyzer. Respond ONLY with valid JSON. No explanations." if is_json else "You are an expert resume and cover letter writer. Follow instructions exactly."
+    
     payload = {
         "model": settings.OLLAMA_MODEL,
         "messages": [
-            {"role": "system", "content": "You are an ATS resume analyzer. Respond ONLY with valid JSON. No explanations."},
+            {"role": "system", "content": system_prompt},
             {"role": "user", "content": prompt}
         ],
         "stream": False,
-        "format": "json",
         "options": {
-            "temperature": 0.1,
+            "temperature": 0.1 if is_json else 0.7,
             "num_predict": max_tokens,
         },
     }
+    
+    if is_json:
+        payload["format"] = "json"
     try:
         response = await client.post(
             f"{settings.OLLAMA_BASE_URL}/api/chat",
@@ -132,6 +137,10 @@ async def _call_ollama(prompt: str, max_tokens: int = 2048) -> Dict[str, Any]:
         if not raw:
             logger.error("Ollama returned empty response. Full data: %s", data)
             return {}
+            
+        if not is_json:
+            return {"text": raw.strip()}
+            
         return _parse_json(raw)
     except httpx.TimeoutException:
         logger.error("Ollama request timed out after 300s")
@@ -144,22 +153,31 @@ async def _call_ollama(prompt: str, max_tokens: int = 2048) -> Dict[str, Any]:
         return {}
 
 
-async def _call_openai(prompt: str) -> Dict[str, Any]:
+async def _call_openai(prompt: str, is_json: bool = True) -> Dict[str, Any]:
     """Call OpenAI API."""
     from openai import AsyncOpenAI
     client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    
+    system_prompt = "You are an expert resume and ATS analyst. Always respond with valid JSON only." if is_json else "You are an expert resume and cover letter writer. Follow instructions exactly."
+    
+    kwargs = {}
+    if is_json:
+        kwargs["response_format"] = {"type": "json_object"}
+        
     try:
         response = await client.chat.completions.create(
             model=settings.OPENAI_MODEL,
             messages=[
-                {"role": "system", "content": "You are an expert resume and ATS analyst. Always respond with valid JSON only."},
+                {"role": "system", "content": system_prompt},
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.2,
-            response_format={"type": "json_object"},
+            temperature=0.2 if is_json else 0.7,
             timeout=300.0,
+            **kwargs
         )
-        raw = response.choices[0].message.content or "{}"
+        raw = response.choices[0].message.content or ""
+        if not is_json:
+            return {"text": raw.strip()}
         return _parse_json(raw)
     except Exception as e:
         logger.error("OpenAI error: %s", e)

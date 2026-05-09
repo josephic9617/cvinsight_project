@@ -16,6 +16,16 @@ const error = ref(null)
 const loading = ref(true)
 const copied = ref(false)
 
+const loadingTexts = [
+  'Analyzing job description...', 
+  'Matching your skills...', 
+  'Crafting professional intro...', 
+  'Refining cover letter...', 
+  'Adding finishing touches...'
+]
+const currentLoadingText = ref('Writing with AI...')
+let loadingInterval = null
+
 const tones = [
   { id: 'professional', label: 'Professional', icon: '👔' },
   { id: 'creative', label: 'Creative', icon: '🎨' },
@@ -47,6 +57,13 @@ const generateLetter = async () => {
 
   isGenerating.value = true
   error.value = null
+  
+  let textIndex = 0
+  currentLoadingText.value = loadingTexts[0]
+  loadingInterval = setInterval(() => {
+    textIndex = (textIndex + 1) % loadingTexts.length
+    currentLoadingText.value = loadingTexts[textIndex]
+  }, 2500)
 
   try {
     const res = await api.post('/generate-cover-letter', {
@@ -59,6 +76,7 @@ const generateLetter = async () => {
     error.value = getErrorMessage(err, 'Failed to generate cover letter.')
   } finally {
     isGenerating.value = false
+    clearInterval(loadingInterval)
   }
 }
 
@@ -133,7 +151,7 @@ const copyToClipboard = async () => {
           >
             <Loader2 v-if="isGenerating" class="w-5 h-5 animate-spin" />
             <Sparkles v-else class="w-5 h-5" />
-            {{ isGenerating ? 'Writing with AI...' : 'Generate Cover Letter' }}
+            {{ isGenerating ? currentLoadingText : 'Generate Cover Letter' }}
           </button>
         </div>
 

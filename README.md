@@ -7,26 +7,32 @@
 
 **CVInsight** is a high-performance, AI-driven career assistant designed to bridge the gap between candidates and Applicant Tracking Systems (ATS). By leveraging state-of-the-art LLMs, CVInsight provides deep structural analysis, keyword optimization, and real-time job description matching.
 
+![CVInsight Main](./screenshots/image-1.png)
+
 ---
 
 ## 🌟 Key Features
 
 ### 📄 Intelligent Resume Analysis
+![Resume Analysis](./screenshots/image-2.png)
 - **Deep Scanning**: Supports PDF and DOCX formats with high-fidelity text extraction.
 - **Dual Scoring**: Provides an **Overall Quality Score** and a specialized **ATS Compatibility Score**.
 - **SWOT Analysis**: Automatically identifies **Strengths**, **Weaknesses**, and **Actionable Opportunities**.
 
 ### 🎯 Job Match Mode (Precision Targeting)
+![Job Match Mode](./screenshots/image-3.png)
 - **Gap Analysis**: Paste any job description to see an instant match percentage.
 - **Skill Mapping**: Visualizes matched vs. missing skills required for the specific role.
 - **Tailoring Advice**: Get AI-generated advice on how to rewrite sections to fit the job.
 
 ### 🔑 ATS Optimization
+![ATS Optimization](./screenshots/image-4.png)
 - **Keyword Detection**: Scans for industry-standard terminology expected by recruiters.
 - **Formatting Tips**: Identify common formatting pitfalls that cause ATS rejection.
 - **Professional Rewrite**: Instantly generate a high-impact executive summary.
 
 ### 📊 Professional Dashboard
+![Professional Dashboard](./screenshots/image-5.png)
 - **History Tracking**: Keep a secure record of all past resume versions and analyses.
 - **Premium UI**: Sleek, dark-themed interface built with glassmorphism and modern typography.
 
@@ -74,6 +80,7 @@ npm run dev
 ---
 
 ## 🧠 AI Configuration
+![AI Configuration](./screenshots/image-6.png)
 
 CVInsight is built to be **Privacy-First**. By default, it uses **Ollama** to run models locally on your hardware.
 
